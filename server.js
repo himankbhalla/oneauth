@@ -1,7 +1,6 @@
 /**
  * Created by championswimmer on 08/03/17.
  */
-require('newrelic')
 const express = require('express')
     , bodyParser = require('body-parser')
     , session = require('express-session')
@@ -12,23 +11,51 @@ const express = require('express')
     , expressGa = require('express-ga-middleware')
     , flash = require('express-flash')
     , Raven = require('raven')
-    , debug = require('debug')('oneauth:server')
+    , connectDatadog = require('connect-datadog')
+    , Tracer = require('datadog-tracer')
 
 const secrets = require('./secrets.json')
     , config = require('./config')
     , loginrouter = require('./routers/login')
     , connectrouter = require('./routers/connect')
+    , disconnectrouter = require('./routers/disconnect')
     , logoutrouter = require('./routers/logoutrouter')
     , signuprouter = require('./routers/signup')
     , apirouter = require('./routers/api')
     , oauthrouter = require('./routers/oauthrouter')
-    , pagerouter = require('./routers/pagerouter')
-    , {expresstracer, datadogRouter} = require('./utils/ddtracer')
+    , pagerouter = require('./routers/pagerouter');
 
 const app = express();
 
 // ============== START DATADOG
-app.use(expresstracer)
+const datadogRouter = connectDatadog({
+  'response_code':true,
+  'tags': ['app:oneauth']
+})
+
+const tracer = new Tracer({service: 'oneauth'})
+function trace (req, res, span) {
+  span.addTags({
+    'resource': req.path,
+    'type': 'web',
+    'span.kind': 'server',
+    'http.method': req.method,
+    'http.url': req.url,
+    'http.status_code': res.statusCode
+  })
+
+  span.finish()
+}
+
+app.use((req, res, next) => {
+  const span = tracer.startSpan('express.request')
+
+  res.on('finish', () => trace(req, res, span))
+  res.on('close', () => trace(req, res, span))
+
+  next()
+})
+
 // ================= END DATADOG
 const redirectToHome = function (req, res, next) {
 
@@ -71,6 +98,7 @@ app.use(expressGa('UA-83327907-7'));
 app.use(datadogRouter)
 app.use('/login', loginrouter);
 app.use('/connect', connectrouter);
+app.use('/disconnect', disconnectrouter);
 app.use('/logout', logoutrouter);
 app.use('/signup', signuprouter);
 app.use('/api', apirouter);
@@ -80,5 +108,5 @@ app.use('/', pagerouter);
 app.use(Raven.errorHandler());
 
 app.listen(3838, function () {
-    debug("Listening on " + config.SERVER_URL );
+    console.log("Listening on " + config.SERVER_URL );
 });
