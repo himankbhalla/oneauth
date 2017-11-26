@@ -6,13 +6,15 @@ const models = require('../../db/models').models;
 
 function DisconnectGithub(req,res){
 
-console.log(req.user.id);
-models.UserGithub.destroy({
-  where: {id: req.user.id}
-}).then(function(user) {
+  models.UserGithub.destroy({
+    where: {userId: req.user.id}
+  })
+  .then(function(user) {
     console.log(user, "github");
-}).catch((err) => console.log(err))
+    //res.redirect('/users/me');
 
+  })
+  .catch((err) => console.log(err))
 
 }
 

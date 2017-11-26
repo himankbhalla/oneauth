@@ -35,36 +35,39 @@
         <td class="font-weight-bold"> Role@CB </td>
         <td> {{user.role}} </td>
     </tr>
-    {{#if user.userfacebook}}
+    {{!#if user.userfacebook}}
     <tr id="profile-row-fb">
         <td class="font-weight-bold"> Facebook </td>
         <td> Connected to
             <a target="_blank" href="http://facebook.com/{{user.userfacebook.id}}">
             {{user.userfacebook.id}}
             </a>
+            <a href="/disconnect/facebook" title="Disconnect Facebook"><i class="fa fa-times" aria-hidden="true"></i></a>
         </td>
     </tr>
-    {{/if}}
-    {{#if user.usertwitter}}
+    {{!/if}}
+    {{!#if user.usertwitter}}
         <tr id="profile-row-twitter">
             <td class="font-weight-bold"> Twitter </td>
             <td> Connected to
                 <a target="_blank" href="http://twitter.com/{{user.usertwitter.username}}">
                 {{user.usertwitter.username}}
                 </a>
+                <a href="/disconnect/twitter" title="Disconnect Twitter"><i class="fa fa-times" aria-hidden="true"></i></a>
             </td>
         </tr>
-    {{/if}}
-    {{#if user.usergithub}}
+    {{!/if}}
+    {{!#if user.usergithub}}
         <tr id="profile-row-github">
             <td class="font-weight-bold"> Github </td>
             <td> Connected to
                 <a target="_blank" href="http://github.com/{{user.usergithub.username}}">
                     {{user.usergithub.username}}
                 </a>
+                <a href="disconnect/github" title="Disconnect Github"><i class="fa fa-times" aria-hidden="true"></i></a>
             </td>
         </tr>
-    {{/if}}
+    {{!/if}}
 
 </table>
 

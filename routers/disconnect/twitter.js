@@ -6,13 +6,14 @@ const models = require('../../db/models').models;
 
 function DisconnectTwitter(req,res){
 
-console.log(req.user.id);
-models.UserTwitter.destroy({
-  where: {id: req.user.id}
-}).then(function(user) {
+  models.UserTwitter.destroy({
+    where: {userId: req.user.id}
+  })
+  .then(function(user) {
     console.log(user, "twitter");
-}).catch((err) => console.log(err))
-
+    //res.redirect('/users/me');
+  })
+  .catch((err) => console.log(err))
 
 }
 
