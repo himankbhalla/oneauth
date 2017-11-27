@@ -38,7 +38,16 @@ module.exports = new FacebookStrategy({
             photo: "https://graph.facebook.com/" + profileJson.id + "/picture?type=large",
             userId: oldUser.id
         }).then(function (updated) {
-            return models.User.findById(oldUser.id)
+            return models.User.update({
+              photo: "https://graph.facebook.com/" + profileJson.id + "/picture?type=large"
+            }, {
+              where: {
+                id: oldUser.id
+              }
+            }).then((user) => {
+              return models.User.findById(oldUser.id)
+            })
+
         }).then(function (user) {
           // DATADOG TRACE: END SPAN
               setImmediate(() => {
